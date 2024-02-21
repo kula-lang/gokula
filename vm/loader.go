@@ -3,7 +3,7 @@ package vm
 import (
 	"encoding/binary"
 	"fmt"
-	"gokula/runtime"
+	"gokula/objects"
 	"io"
 	"os"
 	"strings"
@@ -103,10 +103,10 @@ func Load(path string) (*CompiledFile, error) {
 			if err != nil {
 				return nil, err
 			}
-			literal := runtime.KulaString(bytes)
+			literal := objects.KulaString(bytes)
 			compiledFile.Literals = append(compiledFile.Literals, &literal)
 		case DOUBLE:
-			var number runtime.KulaNumber
+			var number objects.KulaNumber
 			err = binary.Read(file, binary.LittleEndian, &number)
 			if err != nil {
 				return nil, err

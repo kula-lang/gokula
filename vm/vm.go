@@ -2,7 +2,7 @@ package vm
 
 import (
 	"fmt"
-	"gokula/runtime"
+	"gokula/objects"
 	"gokula/utils"
 	"strings"
 )
@@ -159,9 +159,9 @@ func (ins *Instruction) run() error {
 				return err
 			}
 			currentStack.Push(val)
-		} else if object, ok := function.(*runtime.KulaObject); ok {
-			key := runtime.FUNC__
-			functionSugar := object.Get((*runtime.KulaString)(&key))
+		} else if object, ok := function.(*objects.KulaObject); ok {
+			key := objects.FUNC__
+			functionSugar := object.Get((*objects.KulaString)(&key))
 			if vmf, ok := functionSugar.(*VMFunction); ok {
 				vmf.calcVMFunction(argv)
 			} else {
@@ -189,9 +189,9 @@ func (ins *Instruction) run() error {
 				return err
 			}
 			currentStack.Push(val)
-		} else if object, ok := function.(*runtime.KulaObject); ok {
-			key := runtime.FUNC__
-			functionSugar := object.Get((*runtime.KulaString)(&key))
+		} else if object, ok := function.(*objects.KulaObject); ok {
+			key := objects.FUNC__
+			functionSugar := object.Get((*objects.KulaString)(&key))
 			if vmf, ok := functionSugar.(*VMFunction); ok {
 				vmf.CallSite = &callSite
 				vmf.calcVMFunction(argv)
@@ -204,31 +204,31 @@ func (ins *Instruction) run() error {
 	case PRINT:
 		ls := make([]string, ins.Val)
 		for t := ins.Val - 1; t >= 0; t-- {
-			ls[t] = string(*runtime.Stringify(currentStack.Pop()))
+			ls[t] = string(*objects.Stringify(currentStack.Pop()))
 		}
 		fmt.Println(strings.Join(ls, " "))
 	case JMP:
 		ip = ins.Val - 1
 	case JMPT:
-		if runtime.Booleanify(currentStack.Pop()) {
+		if objects.Booleanify(currentStack.Pop()) {
 			ip = ins.Val - 1
 		}
 	case JMPF:
-		if !runtime.Booleanify(currentStack.Pop()) {
+		if !objects.Booleanify(currentStack.Pop()) {
 			ip = ins.Val - 1
 		}
 	// calculating
 	case ADD:
 		v2 := currentStack.Pop()
 		v1 := currentStack.Pop()
-		if n1, ok := v1.(runtime.KulaNumber); ok {
-			if n2, ok := v2.(runtime.KulaNumber); ok {
+		if n1, ok := v1.(objects.KulaNumber); ok {
+			if n2, ok := v2.(objects.KulaNumber); ok {
 				currentStack.Push(n1 + n2)
 				break
 			}
 		}
-		if s1, ok := v1.(*runtime.KulaString); ok {
-			if s2, ok := v2.(*runtime.KulaString); ok {
+		if s1, ok := v1.(*objects.KulaString); ok {
+			if s2, ok := v2.(*objects.KulaString); ok {
 				str := *s1 + *s2
 				currentStack.Push(&str)
 				break
@@ -238,8 +238,8 @@ func (ins *Instruction) run() error {
 	case SUB:
 		v2 := currentStack.Pop()
 		v1 := currentStack.Pop()
-		if n1, ok := v1.(runtime.KulaNumber); ok {
-			if n2, ok := v2.(runtime.KulaNumber); ok {
+		if n1, ok := v1.(objects.KulaNumber); ok {
+			if n2, ok := v2.(objects.KulaNumber); ok {
 				currentStack.Push(n1 - n2)
 				break
 			}
@@ -248,8 +248,8 @@ func (ins *Instruction) run() error {
 	case MUL:
 		v2 := currentStack.Pop()
 		v1 := currentStack.Pop()
-		if n1, ok := v1.(runtime.KulaNumber); ok {
-			if n2, ok := v2.(runtime.KulaNumber); ok {
+		if n1, ok := v1.(objects.KulaNumber); ok {
+			if n2, ok := v2.(objects.KulaNumber); ok {
 				currentStack.Push(n1 * n2)
 				break
 			}
@@ -258,8 +258,8 @@ func (ins *Instruction) run() error {
 	case DIV:
 		v2 := currentStack.Pop()
 		v1 := currentStack.Pop()
-		if n1, ok := v1.(runtime.KulaNumber); ok {
-			if n2, ok := v2.(runtime.KulaNumber); ok {
+		if n1, ok := v1.(objects.KulaNumber); ok {
+			if n2, ok := v2.(objects.KulaNumber); ok {
 				currentStack.Push(n1 / n2)
 				break
 			}
@@ -268,9 +268,9 @@ func (ins *Instruction) run() error {
 	case MOD:
 		v2 := currentStack.Pop()
 		v1 := currentStack.Pop()
-		if n1, ok := v1.(runtime.KulaNumber); ok {
-			if n2, ok := v2.(runtime.KulaNumber); ok {
-				currentStack.Push(runtime.KulaNumber(int(n1) % int(n2)))
+		if n1, ok := v1.(objects.KulaNumber); ok {
+			if n2, ok := v2.(objects.KulaNumber); ok {
+				currentStack.Push(objects.KulaNumber(int(n1) % int(n2)))
 				break
 			}
 		}
@@ -278,9 +278,9 @@ func (ins *Instruction) run() error {
 	case GT:
 		v2 := currentStack.Pop()
 		v1 := currentStack.Pop()
-		if n1, ok := v1.(runtime.KulaNumber); ok {
-			if n2, ok := v2.(runtime.KulaNumber); ok {
-				currentStack.Push(runtime.KulaBool(n1 > n2))
+		if n1, ok := v1.(objects.KulaNumber); ok {
+			if n2, ok := v2.(objects.KulaNumber); ok {
+				currentStack.Push(objects.KulaBool(n1 > n2))
 				break
 			}
 		}
@@ -288,9 +288,9 @@ func (ins *Instruction) run() error {
 	case GE:
 		v2 := currentStack.Pop()
 		v1 := currentStack.Pop()
-		if n1, ok := v1.(runtime.KulaNumber); ok {
-			if n2, ok := v2.(runtime.KulaNumber); ok {
-				currentStack.Push(runtime.KulaBool(n1 >= n2))
+		if n1, ok := v1.(objects.KulaNumber); ok {
+			if n2, ok := v2.(objects.KulaNumber); ok {
+				currentStack.Push(objects.KulaBool(n1 >= n2))
 				break
 			}
 		}
@@ -298,9 +298,9 @@ func (ins *Instruction) run() error {
 	case LT:
 		v2 := currentStack.Pop()
 		v1 := currentStack.Pop()
-		if n1, ok := v1.(runtime.KulaNumber); ok {
-			if n2, ok := v2.(runtime.KulaNumber); ok {
-				currentStack.Push(runtime.KulaBool(n1 < n2))
+		if n1, ok := v1.(objects.KulaNumber); ok {
+			if n2, ok := v2.(objects.KulaNumber); ok {
+				currentStack.Push(objects.KulaBool(n1 < n2))
 				break
 			}
 		}
@@ -308,9 +308,9 @@ func (ins *Instruction) run() error {
 	case LE:
 		v2 := currentStack.Pop()
 		v1 := currentStack.Pop()
-		if n1, ok := v1.(runtime.KulaNumber); ok {
-			if n2, ok := v2.(runtime.KulaNumber); ok {
-				currentStack.Push(runtime.KulaBool(n1 <= n2))
+		if n1, ok := v1.(objects.KulaNumber); ok {
+			if n2, ok := v2.(objects.KulaNumber); ok {
+				currentStack.Push(objects.KulaBool(n1 <= n2))
 				break
 			}
 		}
@@ -318,14 +318,14 @@ func (ins *Instruction) run() error {
 	case EQ:
 		v2 := currentStack.Pop()
 		v1 := currentStack.Pop()
-		currentStack.Push(runtime.KulaBool(v1 == v2))
+		currentStack.Push(objects.KulaBool(v1 == v2))
 	case NEQ:
 		v2 := currentStack.Pop()
 		v1 := currentStack.Pop()
-		currentStack.Push(runtime.KulaBool(v1 != v2))
+		currentStack.Push(objects.KulaBool(v1 != v2))
 	case NEG:
 		top := currentStack.Pop()
-		currentStack.Push(runtime.Booleanify(top))
+		currentStack.Push(objects.Booleanify(top))
 	default:
 		fmt.Println("err: ", ins.Op.String())
 	}
@@ -334,41 +334,41 @@ func (ins *Instruction) run() error {
 }
 
 func evalGet(container any, key any, ins *Instruction) (any, error) {
-	if object, ok := container.(*runtime.KulaObject); ok {
-		if keyString, ok := key.(*runtime.KulaString); ok {
+	if object, ok := container.(*objects.KulaObject); ok {
+		if keyString, ok := key.(*objects.KulaString); ok {
 			return object.Get(keyString), nil
 		}
 		return nil, fmt.Errorf("index of 'Object' can only be 'String'")
-	} else if array, ok := container.(*runtime.KulaArray); ok {
-		if keyNumber, ok := key.(runtime.KulaNumber); ok {
+	} else if array, ok := container.(*objects.KulaArray); ok {
+		if keyNumber, ok := key.(objects.KulaNumber); ok {
 			return array.Get(keyNumber), nil
-		} else if keyString, ok := key.(*runtime.KulaString); ok {
-			return runtime.ArrayProto.Get(keyString), nil
+		} else if keyString, ok := key.(*objects.KulaString); ok {
+			return objects.ArrayProto.Get(keyString), nil
 		}
 		return nil, fmt.Errorf("index of 'Array' can only be 'Number'")
 	}
 
-	if keyString, ok := key.(*runtime.KulaString); ok {
-		if _, ok := container.(*runtime.KulaString); ok {
-			return runtime.StringProto.Get(keyString), nil
-		} else if _, ok := container.(runtime.KulaNumber); ok {
-			return runtime.NumberProto.Get(keyString), nil
-		} else if _, ok := container.(runtime.KulaBool); ok {
-			return runtime.BoolProto.Get(keyString), nil
+	if keyString, ok := key.(*objects.KulaString); ok {
+		if _, ok := container.(*objects.KulaString); ok {
+			return objects.StringProto.Get(keyString), nil
+		} else if _, ok := container.(objects.KulaNumber); ok {
+			return objects.NumberProto.Get(keyString), nil
+		} else if _, ok := container.(objects.KulaBool); ok {
+			return objects.BoolProto.Get(keyString), nil
 		}
 	}
 	return nil, fmt.Errorf("what do you want to get?")
 }
 
 func evalSet(container any, key, value any) error {
-	if object, ok := container.(*runtime.KulaObject); ok {
-		if keyString, ok := key.(*runtime.KulaString); ok {
+	if object, ok := container.(*objects.KulaObject); ok {
+		if keyString, ok := key.(*objects.KulaString); ok {
 			object.Set(keyString, value)
 			return nil
 		}
 	}
-	if array, ok := container.(*runtime.KulaArray); ok {
-		if keyNumber, ok := key.(runtime.KulaNumber); ok {
+	if array, ok := container.(*objects.KulaArray); ok {
+		if keyNumber, ok := key.(objects.KulaNumber); ok {
 			array.Set(keyNumber, value)
 			return nil
 		}

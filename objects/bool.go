@@ -1,4 +1,4 @@
-package runtime
+package objects
 
 type KulaBool bool
 
