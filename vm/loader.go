@@ -60,7 +60,7 @@ func Load(path string) (*CompiledFile, error) {
 	}
 
 	var byte_buffer uint8
-	// Read Signal Table
+	// Read Symbol Table
 	for {
 		err := binary.Read(file, binary.LittleEndian, &byte_buffer)
 		if err != nil {
